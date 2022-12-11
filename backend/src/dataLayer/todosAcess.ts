@@ -52,9 +52,10 @@ export class TodosAccess {
                 todoId: todoId,
                 userId: userId                
             },
-            UpdateExpression: "set name = :name, dueDate = :dueDate, done = :done",
+            UpdateExpression: "set #todoName = :todoName, dueDate = :dueDate, done = :done",
+            ExpressionAttributeNames: { '#todoName': "name" },
             ExpressionAttributeValues: {
-                ":name": model.name,
+                ":todoName": model.name,
                 ":dueDate": model.dueDate,
                 ":done": model.done
             },

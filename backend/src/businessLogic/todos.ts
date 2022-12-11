@@ -13,7 +13,7 @@ const attachmentUtils = new AttachmentUtils();
 export async function createTodo(model: CreateTodoRequest, userId: string): Promise<TodoItem> {
     logger.info(`Create todo for user: ${userId}`);
 
-    const newItem = {} as TodoItem;
+    const newItem: TodoItem = {} as TodoItem;
     newItem.userId = userId;
     newItem.todoId = uuidv4();
     newItem.createdAt = new Date().toISOString();
@@ -45,8 +45,10 @@ export async function deleteTodo(todoId: string, userId: string) {
 export async function createAttachmentPresignedUrl(todoId: string, userId: string): Promise<string> {
     logger.info("Create attachment presigned url");
 
-    const attachmentUrl:string = attachmentUtils.getSignedUrl(todoId); 
-    await todoAccess.updateAttachmentForTodo(todoId, userId, attachmentUrl);
+    const dbUrl: string = `https://${process.env.ATTACHMENT_S3_BUCKET}.s3.amazonaws.com/${todoId}`;
+    const attachmentUrl:string = attachmentUtils.getSignedUrl(todoId);
+
+    await todoAccess.updateAttachmentForTodo(todoId, userId, dbUrl);
 
     return attachmentUrl;
 }
