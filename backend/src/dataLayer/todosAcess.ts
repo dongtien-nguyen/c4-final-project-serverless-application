@@ -1,21 +1,19 @@
 import * as AWS from 'aws-sdk';
 import * as AWSXRay from 'aws-xray-sdk';
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { createLogger } from '../utils/logger';
 import { TodoItem } from '../models/TodoItem';
 import { TodoUpdate } from '../models/TodoUpdate';
 
 const XAWS = AWSXRay.captureAWS(AWS);
-XAWS.config.update({region: process.env.DEFAULT_AWS_REGION || 'us-east-1'});
+const docClient = new XAWS.DynamoDB.DocumentClient();
 
 const logger = createLogger('TodosAccess');
 
 export class TodosAccess {
     constructor(
-        private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
-        private readonly todosTable = process.env.TODOS_TABLE) {
-    }
-  
+        private readonly todosTable = process.env.TODOS_TABLE
+    ) { }
+
     async getTodos(userId: string): Promise<TodoItem[]> {
         logger.debug('Getting all todos');
 
@@ -27,7 +25,7 @@ export class TodosAccess {
             }
         };
   
-        const result = await this.docClient.query(params).promise();
+        const result = await docClient.query(params).promise();
   
         return result.Items as TodoItem[];
     }
@@ -35,7 +33,7 @@ export class TodosAccess {
     async createTodo(todo: TodoItem): Promise<TodoItem> {
         logger.debug('Create new todo');
 
-        await this.docClient.put({
+        await docClient.put({
             TableName: this.todosTable,
             Item: todo
         }).promise();
@@ -62,7 +60,7 @@ export class TodosAccess {
             ReturnValues: "ALL_NEW"
         };
 
-        const result = await this.docClient.update(params).promise();
+        const result = await docClient.update(params).promise();
 
         return result.Attributes as TodoItem;
     }
@@ -78,7 +76,7 @@ export class TodosAccess {
             },
         };
 
-        return await this.docClient.delete(params).promise();
+        return await docClient.delete(params).promise();
     }
 
     async updateAttachmentForTodo(todoId: string, userId: string, attachmentUrl: string): Promise<TodoItem> {
@@ -97,7 +95,7 @@ export class TodosAccess {
             ReturnValues: "ALL_NEW"
         };
 
-        const result = await this.docClient.update(params).promise();
+        const result = await docClient.update(params).promise();
 
         return result.Attributes as TodoItem;
     }

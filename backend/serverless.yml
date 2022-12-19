@@ -1,5 +1,4 @@
 # TODO: Change the name of the org 
-org: dongtiennguyen
 app: serverless-todo-app
 service: serverless-todo-app
 
@@ -12,7 +11,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   lambdaHashingVersion: '20201221'
 
   stage: ${opt:stage, 'dev'}
@@ -33,15 +32,6 @@ provider:
   logs:
     # Enable API Gateway logs
     restApi: true
-
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - xray:PutTelemetryRecords
-            - xray:PutTraceSegments
-          Resource: "*"
 
 custom:
   documentation:
